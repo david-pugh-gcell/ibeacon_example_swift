@@ -22,13 +22,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         let uuidString = "96530D4D-09AF-4159-B99E-951A5E826584"
         let beaconIdentifier = "gcell.ibeacon.com"
         let beaconUUID = NSUUID(UUIDString: uuidString)
-        let beaconRegion:CLBeaconRegion = CLBeaconRegion(proximityUUID: beaconUUID,
+        let beaconRegion:CLBeaconRegion = CLBeaconRegion(proximityUUID: beaconUUID!,
             identifier: beaconIdentifier)
         
         //Set up Location Manager and handle authorisation
         locationManager = CLLocationManager()
         if(locationManager!.respondsToSelector("requestAlwaysAuthorization")) {
-            locationManager!.requestAlwaysAuthorization()
+            if #available(iOS 8.0, *) {
+                locationManager!.requestAlwaysAuthorization()
+            } else {
+                // Fallback on earlier versions
+            }
         }
         
         //Start monitoring for the beacon region
@@ -42,12 +46,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         
         //App permission handling to send notifications
         if(application.respondsToSelector("registerUserNotificationSettings:")) {
-            application.registerUserNotificationSettings(
-                UIUserNotificationSettings(
-                    forTypes: UIUserNotificationType.Alert | UIUserNotificationType.Sound,
-                    categories: nil
+            if #available(iOS 8.0, *) {
+                application.registerUserNotificationSettings(
+                    UIUserNotificationSettings(
+                        forTypes: [UIUserNotificationType.Alert, UIUserNotificationType.Sound],
+                        categories: nil
+                    )
                 )
-            )
+            } else {
+                // Fallback on earlier versions
+            }
         }
         
         return true
@@ -75,25 +83,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
 
 //Extension to class to add notifications when in background mode
 
-extension AppDelegate: CLLocationManagerDelegate {
+extension AppDelegate {
     func sendLocalNotificationWithMessage(message: String!) {
         let notification:UILocalNotification = UILocalNotification()
         notification.alertBody = message
         UIApplication.sharedApplication().scheduleLocalNotification(notification)
     }
     
-    func locationManager(manager: CLLocationManager!, didRangeBeacons beacons: [AnyObject]!,inRegion region: CLBeaconRegion!)  {
+    func locationManager(manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon],inRegion region: CLBeaconRegion)  {
             
             NSLog("didRangeBeacons");
             var message:String = ""
         
             //Pass beacons to view controller
             let viewController:ViewController = window!.rootViewController as! ViewController
-            viewController.beacons = (beacons as! [CLBeacon]?)!
+            viewController.beacons = (beacons as [CLBeacon]?)!
             viewController.tableView!.reloadData()
         
             if(beacons.count > 0) {
-                let nearestBeacon:CLBeacon = beacons[0] as! CLBeacon
+                let nearestBeacon:CLBeacon = beacons[0] 
                 
                 //Check to see if the proximity has changed, so we eleimiante redundent notifications
                 if(nearestBeacon.proximity == lastProximity ||
@@ -123,8 +131,8 @@ extension AppDelegate: CLLocationManagerDelegate {
     
     
     //Start Ranging beacon if region has been entered
-    func locationManager(manager: CLLocationManager!,
-        didEnterRegion region: CLRegion!) {
+    func locationManager(manager: CLLocationManager,
+        didEnterRegion region: CLRegion) {
             manager.startRangingBeaconsInRegion(region as! CLBeaconRegion)
             manager.startUpdatingLocation()
             
@@ -134,8 +142,8 @@ extension AppDelegate: CLLocationManagerDelegate {
     
     
     //Stop ranging if the beacon region has exited - saves power
-    func locationManager(manager: CLLocationManager!,
-        didExitRegion region: CLRegion!) {
+    func locationManager(manager: CLLocationManager,
+        didExitRegion region: CLRegion) {
             manager.stopRangingBeaconsInRegion(region as! CLBeaconRegion)
             manager.stopUpdatingLocation()
             

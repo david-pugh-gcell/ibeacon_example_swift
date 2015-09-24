@@ -28,7 +28,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 }
 
 
-extension ViewController: UITableViewDataSource {
+extension ViewController{
     func tableView(tableView: UITableView,
         numberOfRowsInSection section: Int) -> Int {
             if(beacons != nil) {
@@ -41,7 +41,7 @@ extension ViewController: UITableViewDataSource {
     func tableView(tableView: UITableView,
         cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
             var cell:UITableViewCell? =
-            tableView.dequeueReusableCellWithIdentifier("MyIdentifier") as? UITableViewCell
+            tableView.dequeueReusableCellWithIdentifier("MyIdentifier") as UITableViewCell!
             
             if(cell == nil) {
                 cell = UITableViewCell(style: UITableViewCellStyle.Subtitle,
@@ -75,7 +75,7 @@ extension ViewController: UITableViewDataSource {
     }
 }
 
-extension ViewController: UITableViewDelegate {
+extension ViewController {
     
 }
 
