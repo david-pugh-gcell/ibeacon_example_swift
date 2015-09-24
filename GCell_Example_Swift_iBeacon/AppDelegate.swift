@@ -92,7 +92,7 @@ extension AppDelegate {
     
     func locationManager(manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon],inRegion region: CLBeaconRegion)  {
             
-            NSLog("didRangeBeacons");
+            print("didRangeBeacons");
             var message:String = ""
         
             //Pass beacons to view controller
@@ -125,7 +125,7 @@ extension AppDelegate {
                 message = "No beacons are nearby"
             }
             
-            NSLog("%@", message)
+            print("%@", message)
             sendLocalNotificationWithMessage(message)
     }
     
@@ -136,7 +136,7 @@ extension AppDelegate {
             manager.startRangingBeaconsInRegion(region as! CLBeaconRegion)
             manager.startUpdatingLocation()
             
-            NSLog("You entered the region")
+            print("You entered the region")
             sendLocalNotificationWithMessage("You entered the region")
     }
     
@@ -147,7 +147,7 @@ extension AppDelegate {
             manager.stopRangingBeaconsInRegion(region as! CLBeaconRegion)
             manager.stopUpdatingLocation()
             
-            NSLog("You exited the region")
+            print("You exited the region")
             sendLocalNotificationWithMessage("You exited the region")
     }
 }
